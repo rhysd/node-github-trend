@@ -1,5 +1,9 @@
-Scraping GitHub trending repositories
+Scraping GitHub Trending Repositories
 =====================================
+
+[![npm version](https://badge.fury.io/js/github-trend.svg)](http://badge.fury.io/js/github-trend)
+
+[github-trend](https://www.npmjs.com/package/github-trend) is a library for scraping GitHub trending repositories.
 
 ## Only scraping
 
