@@ -1,0 +1,22 @@
+{
+  "name": "github-trend",
+  "version": "0.0.1",
+  "description": "node.js library for GitHub trending repositories",
+  "main": "./build/main.js",
+  "author": "rhysd <lin90162@yahoo.co.jp>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rhysd/node-github-trend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rhysd/node-github-trend/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "es6-promise": "^3.0.2",
+    "github": "^0.2.4",
+    "js-yaml": "^3.4.0",
+    "request": "^2.61.0"
+  }
+}
