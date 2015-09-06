@@ -47,10 +47,12 @@ client.fetchTrending("").then(function(repos){
 
 // Fetch all API call asynchronously
 client.fetchTrendings(["", "vim", "go"]).then(function(repos){
-    repos.forEach(function(repo){
-        // Result of https://api.github.com/repos/:user/:name
-        console.log(repo);
-    });
+    for (var lang in repos) {
+        repos[lang].forEach(function(repo){
+            // Result of https://api.github.com/repos/:user/:name
+            console.log(repo);
+        });
+    }
 }).catch(function(err){
     console.log(err.message);
 });
