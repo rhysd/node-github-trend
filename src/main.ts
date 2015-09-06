@@ -1,7 +1,6 @@
 import * as request from "request";
 import * as cheerio from "cheerio";
 import * as yaml from "js-yaml";
-import * as GitHub from "github";
 
 interface Repository {
     owner: string;
@@ -204,7 +203,13 @@ export class Client {
         }
 
         return Promise.all(promises)
-                      .then((trendings: Object[]) => Array.prototype.concat.apply([], trendings));
+                      .then((trendings: Object[]) => {
+                          let result: any = {};
+                          for (const idx in langs) {
+                              result[langs[idx]] = trendings[idx];
+                          }
+                          return <Object>result;
+                      });
     }
 }
 
