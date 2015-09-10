@@ -234,12 +234,29 @@ export class Client {
 
     fetchTrendingWithReadme(lang: string) {
         return this.fetchTrending(lang).then((repos: Repository[]) => {
-            let promises: Promise<Repository[]>[] = [];
+            let promises: Promise<Repository>[] = [];
             for (const repo of repos) {
                 promises.push(this.fetchAppendingReadme(repo));
             }
             return Promise.all(promises);
         });
+    }
+
+    fetchTrendingsWithReadme(langs: string[]) {
+        let promises: Promise<Repository[]>[] = [];
+
+        for (const lang of langs) {
+            promises.push(this.fetchTrendingWithReadme(lang));
+        }
+
+        return Promise.all(promises)
+                      .then((trendings: Repository[][]) => {
+                          let result: Repositories = {};
+                          for (const idx in langs) {
+                              result[langs[idx]] = trendings[idx];
+                          }
+                          return result;
+                      });
     }
 
     fetchTrendings(langs: string[]) {
