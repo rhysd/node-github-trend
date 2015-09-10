@@ -2,9 +2,17 @@ import * as request from "request";
 import * as cheerio from "cheerio";
 import * as yaml from "js-yaml";
 
-interface Repository {
+interface RepositoryEntry {
     owner: string;
     name: string;
+}
+
+interface Repository {
+    [param: string]: any;
+}
+
+interface Repositories {
+    [lang: string]: Repository[];
 }
 
 interface ScraperConfig {
@@ -154,7 +162,7 @@ export class Client {
         this.scraper = new Scraper(config);
     }
 
-    fetchGetAPI(repo: Repository) {
+    fetchGetAPI(repo: RepositoryEntry) {
         return new Promise((resolve, reject) => {
             let opts: request.Options = {
                 url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
@@ -186,8 +194,8 @@ export class Client {
     }
 
     fetchTrending(lang: string) {
-        return this.scraper.scrapeTrendingRepos(lang).then((repos: Repository[]) => {
-            let promises: Promise<Object>[] = [];
+        return this.scraper.scrapeTrendingRepos(lang).then((repos: RepositoryEntry[]) => {
+            let promises: Promise<Repository>[] = [];
             for (const repo of repos) {
                 promises.push(this.fetchGetAPI(repo));
             }
@@ -195,20 +203,59 @@ export class Client {
         });
     }
 
+    fetchAppendingReadme(repo: {[key: string]: any}) {
+        return new Promise(resolve => {
+            const readme_url = repo['html_url'] + '/README.md';
+            let opts: request.Options = {
+                url: readme_url,
+                method: 'HEAD',
+            }
+
+            if (this.scraper.config.proxy) {
+                opts.proxy = this.scraper.config.proxy;
+            }
+
+            request(opts, (err, res, _) => {
+                if (err) {
+                    resolve(repo);
+                    return;
+                }
+
+                if (res.statusCode !== 200) {
+                    console.log(JSON.stringify(res));
+                    resolve(repo);
+                }
+
+                repo['readme_url'] = readme_url;
+                resolve(repo);
+            });
+        });
+    }
+
+    fetchTrendingWithReadme(lang: string) {
+        return this.fetchTrending(lang).then((repos: Repository[]) => {
+            let promises: Promise<Repository[]>[] = [];
+            for (const repo of repos) {
+                promises.push(this.fetchAppendingReadme(repo));
+            }
+            return Promise.all(promises);
+        });
+    }
+
     fetchTrendings(langs: string[]) {
-        let promises: Promise<Object>[] = [];
+        let promises: Promise<Repository[]>[] = [];
 
         for (const lang of langs) {
             promises.push(this.fetchTrending(lang));
         }
 
         return Promise.all(promises)
-                      .then((trendings: Object[]) => {
-                          let result: any = {};
+                      .then((trendings: Repository[][]) => {
+                          let result: Repositories = {};
                           for (const idx in langs) {
                               result[langs[idx]] = trendings[idx];
                           }
-                          return <Object>result;
+                          return result;
                       });
     }
 }
