@@ -21,8 +21,13 @@ interface ScraperConfig {
 
 interface Language {
     color: string;
-    aliases? : string[];
+    aliases?: string[];
 }
+
+interface Languages {
+    [lang: string]: Language;
+}
+
 
 const RE_HREF_SCRAPE = /^\/([^\/]+)\/([^\/]+)$/;
 
@@ -109,7 +114,7 @@ export class Scraper {
                     return;
                 }
 
-                const langs = yaml.safeLoad(body);
+                const langs: Languages = yaml.safeLoad(body);
                 this.cache = langs
                 resolve(langs);
             });
@@ -117,8 +122,8 @@ export class Scraper {
     }
 
     scrapeLanguageColors() {
-        return this.fetchLanguageYAML().then((langs: any) => {
-            let result: any = {};
+        return this.fetchLanguageYAML().then((langs: Languages) => {
+            let result: {[key: string]: string} = {};
             for (const name in langs) {
                 const lang: Language = langs[name];
                 if (!lang.color) {
@@ -137,7 +142,7 @@ export class Scraper {
     }
 
     scrapeLanguageNames() {
-        return this.fetchLanguageYAML().then((langs: any) => {
+        return this.fetchLanguageYAML().then((langs: Languages) => {
             let result: string[] = [];
             for (const name in langs) {
                 result.push(name);
