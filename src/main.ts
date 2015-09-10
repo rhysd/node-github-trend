@@ -210,7 +210,7 @@ export class Client {
 
     fetchAppendingReadme(repo: {[key: string]: any}) {
         return new Promise(resolve => {
-            const readme_url = repo['html_url'] + '/README.md';
+            const readme_url = repo['html_url'] + '/blob/' + repo['default_branch'] + '/README.md';
             let opts: request.Options = {
                 url: readme_url,
                 method: 'HEAD',
@@ -227,8 +227,8 @@ export class Client {
                 }
 
                 if (res.statusCode !== 200) {
-                    console.log(JSON.stringify(res));
                     resolve(repo);
+                    return;
                 }
 
                 repo['readme_url'] = readme_url;
