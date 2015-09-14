@@ -171,7 +171,7 @@ export class Client {
 
     fetchGetAPI(repo: RepositoryEntry) {
         return new Promise((resolve, reject) => {
-            let headers = {
+            let headers: {[h: string]: string} = {
                     "User-Agent": "request",
                     "Accept" : "application/vnd.github.v3+json"
                 };
