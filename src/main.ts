@@ -162,19 +162,27 @@ export class Scraper {
 
 export class Client {
     scraper: Scraper;
+    token: string;
 
-    constructor(config?: ScraperConfig) {
+    constructor(config?: ScraperConfig, token?: string) {
         this.scraper = new Scraper(config);
+        this.token = token || null;
     }
 
     fetchGetAPI(repo: RepositoryEntry) {
         return new Promise((resolve, reject) => {
-            let opts: request.Options = {
-                url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
-                headers: {
+            let headers = {
                     "User-Agent": "request",
                     "Accept" : "application/vnd.github.v3+json"
-                }
+                };
+
+            if (this.token) {
+                headers['Authorization'] = 'token ' + this.token;
+            }
+
+            let opts: request.Options = {
+                url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
+                headers: headers
             };
 
             if (this.scraper.config.proxy) {
