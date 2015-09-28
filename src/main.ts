@@ -201,7 +201,13 @@ export class Client {
                     return;
                 }
 
-                resolve(JSON.parse(body));
+                // Note:
+                // Sometimes response json may be broken and crashed parser
+                try {
+                    resolve(JSON.parse(body));
+                } catch(e) {
+                    reject(e);
+                }
             });
         });
     }
