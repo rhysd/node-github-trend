@@ -73,7 +73,7 @@ export class Scraper {
     scrapeTrendingRepos(lang_name: string) {
         return this.fetchTrendPage(lang_name).then((html: string) => {
             const dom = cheerio.load(html);
-            return dom(".repo-list-item .repo-list-name a")
+            return dom(".repo-list h3 a")
                             .toArray()
                             .map((a: any) => {
                                 const href: string = a.attribs["href"];
