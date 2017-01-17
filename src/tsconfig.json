@@ -1,14 +1,21 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "node",
     "removeComments": true,
     "preserveConstEnums": true,
     "outDir": "../build",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmitOnError": true,
+    "strictNullChecks": false,
     "target": "es5",
     "sourceMap": true
   },
-  "files": [
+  "include": [
     "main.ts",
     "lib.d.ts"
   ]

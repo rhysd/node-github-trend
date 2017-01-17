@@ -4,6 +4,9 @@
   "description": "node.js library for GitHub trending repositories",
   "main": "./build/main.js",
   "author": "rhysd <lin90162@yahoo.co.jp>",
+  "scripts": {
+    "build": "tsc -p src/"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/rhysd/node-github-trend.git"
@@ -17,5 +20,8 @@
     "es6-promise": "^3.0.2",
     "js-yaml": "^3.4.0",
     "request": "^2.61.0"
+  },
+  "devDependencies": {
+    "typescript": "^2.1.5"
   }
 }
