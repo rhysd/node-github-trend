@@ -29,6 +29,31 @@ scrapeTrendingRepos("go");
 
 `Scraper` only scrapes GitHub trending page. This returns an array of repository information.  This method is relatively faster because of sending request only once per language.
 
+## Scrape and get more info (in one request,without api calls)
+```javascript
+var Trending = require("github-trend");
+var scraper = new Trending.Scraper();
+
+// Empty string means 'all languages'
+scraper.scrapeTrendingReposFullInfo("").then(function(repos){
+    repos.forEach(function(repo){
+        console.log(repo.owner);
+        console.log(repo.name);
+        console.log(repo.description);
+        console.log(repo.language);
+        console.log(repo.allStars);
+        console.log(repo.todaysStars);
+    });
+}).catch(function(err){
+    console.log(err.message);
+});
+
+// For other languages
+scrapeTrendingReposFullInfo("rust");
+scrapeTrendingReposFullInfo("vim");
+scrapeTrendingReposFullInfo("go");
+```
+
 
 ## Scraping and getting full repository information
 
