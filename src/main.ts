@@ -69,6 +69,76 @@ export class Scraper {
             });
         });
     }
+    
+    scrapeTrendingReposFullInfo (lang_name:string) {
+        return this.fetchTrendPage(lang_name).then((html:string)=> {
+            const dom = cheerio.load(html);
+            return dom(".repo-list li")
+                .toArray()
+                .map(function (li, i) {
+                    var result = {
+                        index: i,
+                        name: null,
+                        owner: null,
+                        description: null,
+                        language: null,
+                        allStars: null,
+                        todaysStars: null,
+                    }
+                    //extract owner and repo name
+                    var domElem = dom(li);
+                    var a = domElem.find('h3 a').toArray()[0];
+
+                    var href = a.attribs["href"];
+                    var match = href.match(RE_HREF_SCRAPE);
+
+                    if (!match) {
+                        console.log("Invalid repo: " + href);
+                    }
+
+                    result.owner = match[1];
+                    result.name = match[2];
+
+                    //extract description
+                    var p = domElem.find('p').toArray()[0];
+                    if (p) {
+                        result.description = p.children[0].data
+                    }
+
+                    //extract programming language
+                    var lang = domElem.find('[itemprop="programmingLanguage"]').toArray()[0];
+                    if (lang) {
+                        result.language = lang.children[0].data
+                    }
+
+                    //extract all stars
+                    var allStars = domElem.find('[aria-label="Stargazers"]').toArray()[0];
+                    if (allStars) {
+                        result.allStars = allStars.children[2].data
+                    }
+
+                    //extract todays stars
+                    var todaysStars = domElem.find('.text-gray span:last-child').toArray()[0];
+                    if (todaysStars) {
+                        result.todaysStars = todaysStars.children[2].data
+                    }
+
+
+                    //clean result
+                    var emptyStringmatcher = /^\s+|\s+$/g;
+
+                    var keys = Object.keys(result);
+
+                    keys.forEach(k => {
+                        if (typeof result[k] === 'string' || result[k] instanceof String) {
+                            result[k] = result[k].replace(emptyStringmatcher, '');
+                        }
+                    });
+
+                    return result;
+                });
+        });
+    };
 
     scrapeTrendingRepos(lang_name: string) {
         return this.fetchTrendPage(lang_name).then((html: string) => {
