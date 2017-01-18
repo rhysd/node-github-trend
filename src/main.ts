@@ -28,6 +28,16 @@ interface Languages {
     [lang: string]: Language;
 }
 
+interface FullRepository {
+    index: number;
+    name: string;
+    owner: string;
+    description: string;
+    language: string;
+    allStars: string;
+    todaysStars: string;
+    [k: string]: string | number;
+}
 
 const RE_HREF_SCRAPE = /^\/([^\/]+)\/([^\/]+)$/;
 
@@ -76,7 +86,7 @@ export class Scraper {
             return dom(".repo-list li")
                 .toArray()
                 .map(function (li, i) {
-                    var result = {
+                    const result = {
                         index: i,
                         name: null,
                         owner: null,
@@ -84,54 +94,52 @@ export class Scraper {
                         language: null,
                         allStars: null,
                         todaysStars: null,
-                    }
+                    } as FullRepository;
                     //extract owner and repo name
-                    var domElem = dom(li);
-                    var a = domElem.find('h3 a').toArray()[0];
+                    const domElem = dom(li);
+                    const a = domElem.find('h3 a').toArray()[0];
 
-                    var href = a.attribs["href"];
-                    var match = href.match(RE_HREF_SCRAPE);
+                    const href: string = (a.attribs as any)['href'];
+                    const match = href.match(RE_HREF_SCRAPE);
 
-                    if (!match) {
-                        console.log("Invalid repo: " + href);
+                    if (match) {
+                        result.owner = match[1];
+                        result.name = match[2];
                     }
 
-                    result.owner = match[1];
-                    result.name = match[2];
-
-                    //extract description
-                    var p = domElem.find('p').toArray()[0];
+                    // extract description
+                    const p = domElem.find('p').toArray()[0];
                     if (p) {
-                        result.description = p.children[0].data
+                        result.description = (p.children[0] as any).data
                     }
 
-                    //extract programming language
-                    var lang = domElem.find('[itemprop="programmingLanguage"]').toArray()[0];
+                    // extract programming language
+                    const lang = domElem.find('[itemprop="programmingLanguage"]').toArray()[0];
                     if (lang) {
-                        result.language = lang.children[0].data
+                        result.language = (lang.children[0] as any).data
                     }
 
-                    //extract all stars
-                    var allStars = domElem.find('[aria-label="Stargazers"]').toArray()[0];
+                    // extract all stars
+                    const allStars = domElem.find('[aria-label="Stargazers"]').toArray()[0];
                     if (allStars) {
-                        result.allStars = allStars.children[2].data
+                        result.allStars = (allStars.children[2] as any).data
                     }
 
-                    //extract todays stars
-                    var todaysStars = domElem.find('.text-gray span:last-child').toArray()[0];
+                    // extract todays stars
+                    const todaysStars = domElem.find('.text-gray span:last-child').toArray()[0];
                     if (todaysStars) {
-                        result.todaysStars = todaysStars.children[2].data
+                        result.todaysStars = (todaysStars.children[2] as any).data
                     }
-
 
                     //clean result
-                    var emptyStringmatcher = /^\s+|\s+$/g;
+                    const emptyStringmatcher = /^\s+$/g;
 
-                    var keys = Object.keys(result);
+                    const keys = Object.keys(result);
 
                     keys.forEach(k => {
-                        if (typeof result[k] === 'string' || result[k] instanceof String) {
-                            result[k] = result[k].replace(emptyStringmatcher, '');
+                        const v = result[k];
+                        if (typeof v === 'string') {
+                            result[k] = v.replace(emptyStringmatcher, '');
                         }
                     });
 
