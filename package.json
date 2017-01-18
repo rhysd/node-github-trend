@@ -5,7 +5,8 @@
   "main": "./build/main.js",
   "author": "rhysd <lin90162@yahoo.co.jp>",
   "scripts": {
-    "build": "tsc -p src/"
+    "build": "tsc -p src/",
+    "dts": "tsc -p src/ -d --outDir ./"
   },
   "repository": {
     "type": "git",

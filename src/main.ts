@@ -2,33 +2,33 @@ import * as request from "request";
 import * as cheerio from "cheerio";
 import * as yaml from "js-yaml";
 
-interface RepositoryEntry {
+export interface RepositoryEntry {
     owner: string;
     name: string;
 }
 
-interface Repository {
+export interface Repository {
     [param: string]: any;
 }
 
-interface Repositories {
+export interface Repositories {
     [lang: string]: Repository[];
 }
 
-interface ScraperConfig {
+export interface ScraperConfig {
     proxy?: string;
 }
 
-interface Language {
+export interface Language {
     color: string;
     aliases?: string[];
 }
 
-interface Languages {
+export interface Languages {
     [lang: string]: Language;
 }
 
-interface FullRepository {
+export interface FullRepository {
     index: number;
     name: string;
     owner: string;
