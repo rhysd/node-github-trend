@@ -49,9 +49,9 @@ scraper.scrapeTrendingReposFullInfo("").then(function(repos){
 });
 
 // For other languages
-scrapeTrendingReposFullInfo("rust");
-scrapeTrendingReposFullInfo("vim");
-scrapeTrendingReposFullInfo("go");
+scraper.scrapeTrendingReposFullInfo("rust");
+scraper.scrapeTrendingReposFullInfo("vim");
+scraper.scrapeTrendingReposFullInfo("go");
 ```
 
 

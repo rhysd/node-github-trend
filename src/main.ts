@@ -79,7 +79,7 @@ export class Scraper {
             });
         });
     }
-    
+
     scrapeTrendingReposFullInfo (lang_name:string) {
         return this.fetchTrendPage(lang_name).then((html:string)=> {
             const dom = cheerio.load(html);
@@ -132,14 +132,11 @@ export class Scraper {
                     }
 
                     //clean result
-                    const emptyStringmatcher = /^\s+$/g;
-
                     const keys = Object.keys(result);
-
                     keys.forEach(k => {
                         const v = result[k];
                         if (typeof v === 'string') {
-                            result[k] = v.replace(emptyStringmatcher, '');
+                            result[k] = v.trim();
                         }
                     });
 
