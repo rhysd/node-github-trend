@@ -6,7 +6,8 @@
   "author": "rhysd <lin90162@yahoo.co.jp>",
   "scripts": {
     "build": "tsc -p src/",
-    "dts": "tsc -p src/ -d --outDir ./"
+    "dts": "tsc -p src/ -d --outDir ./",
+    "test": "mocha test/"
   },
   "repository": {
     "type": "git",
