@@ -33,13 +33,14 @@ export interface FullRepository {
     name: string;
     owner: string;
     description: string;
-    language: string;
-    allStars: string;
-    todaysStars: string;
+    language: string | null;
+    allStars: number;
+    todaysStars: number;
     [k: string]: string | number;
 }
 
 const RE_HREF_SCRAPE = /^\/([^\/]+)\/([^\/]+)$/;
+const RE_DIGITS = /\d+/;
 
 export class Scraper {
     config: ScraperConfig;
@@ -110,25 +111,28 @@ export class Scraper {
                     // extract description
                     const p = domElem.find('p').toArray()[0];
                     if (p) {
-                        result.description = (p.children[0] as any).data
+                        result.description = (p.children[0] as any).data;
                     }
 
                     // extract programming language
                     const lang = domElem.find('[itemprop="programmingLanguage"]').toArray()[0];
                     if (lang) {
-                        result.language = (lang.children[0] as any).data
+                        result.language = (lang.children[0] as any).data;
                     }
 
                     // extract all stars
-                    const allStars = domElem.find('[aria-label="Stargazers"]').toArray()[0];
+                    const allStars = domElem.find('.muted-link.d-inline-block.mr-3').toArray()[0];
                     if (allStars) {
-                        result.allStars = (allStars.children[2] as any).data
+                        result.allStars = parseInt((allStars.children[2] as any).data, 10);
                     }
 
                     // extract todays stars
                     const todaysStars = domElem.find('.f6.text-gray.mt-2 > span:last-child').toArray()[0];
                     if (todaysStars) {
-                        result.todaysStars = (todaysStars.children[2] as any).data
+                        const numStars = (todaysStars.children[2] as any).data.match(RE_DIGITS);
+                        if (numStars !== null) {
+                            result.todaysStars =  parseInt(numStars, 10);
+                        }
                     }
 
                     //clean result
