@@ -1,0 +1,12 @@
+language: node_js
+
+node_js:
+  - 'stable'
+
+install:
+    - npm install
+    - mkdir -p build
+
+script:
+    - npm run build
+    - npm run test
