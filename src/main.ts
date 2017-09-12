@@ -126,7 +126,7 @@ export class Scraper {
                     }
 
                     // extract todays stars
-                    const todaysStars = domElem.find('.text-gray.mt-2 > span.d-inline-block.float-sm-right').toArray()[0];
+                    const todaysStars = domElem.find('.f6.text-gray.mt-2 > span:last-child').toArray()[0];
                     if (todaysStars) {
                         result.todaysStars = (todaysStars.children[2] as any).data
                     }
