@@ -19,4 +19,15 @@ describe('Scraper', function() {
             }
         });
     });
+
+    it('scrapes colors of languages', function() {
+        return new Scraper().scrapeLanguageColors().then(langs => {
+            assert(Object.keys(langs).length > 0);
+            for (const name in langs) {
+                assert(name);
+                const color = langs[name];
+                assert((/#[0-9a-f]{6}/i).test(color));
+            }
+        });
+    });
 });
