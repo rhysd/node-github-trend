@@ -30,4 +30,13 @@ describe('Scraper', function() {
             }
         });
     });
+
+    it('scrapes names of languages', function() {
+        return new Scraper().scrapeLanguageNames().then(names => {
+            assert(names.length > 0);
+            for (const name of names) {
+                assert(name);
+            }
+        });
+    });
 });
