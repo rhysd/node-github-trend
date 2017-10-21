@@ -32,7 +32,7 @@ export interface FullRepository {
     index: number;
     name: string;
     owner: string;
-    description: string;
+    description: string | null; // When no description is set, this field will be null.
     language: string | null;
     allStars: number;
     todaysStars: number;

@@ -22,7 +22,7 @@ export interface FullRepository {
     index: number;
     name: string;
     owner: string;
-    description: string;
+    description: string | null;
     language: string;
     allStars: string;
     todaysStars: string;

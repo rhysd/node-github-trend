@@ -10,12 +10,12 @@ describe('Scraper', function() {
             assert(repos.length > 0);
             for (const repo of repos) {
                 assert(repo.index >= 0);
-                neq(repo.name, null);
-                neq(repo.owner, null);
-                neq(repo.description, null);
-                neq(repo.language, undefined);
-                neq(repo.allStars, null);
-                neq(repo.todaysStars, null);
+                const msg = JSON.stringify(repo)
+                neq(repo.name, null, msg);
+                neq(repo.owner, null, msg);
+                neq(repo.language, undefined, msg);
+                neq(repo.allStars, null, msg);
+                neq(repo.todaysStars, null, msg);
             }
         });
     });
