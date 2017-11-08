@@ -123,13 +123,13 @@ export class Scraper {
                     // extract all stars
                     const allStars = domElem.find('.muted-link.d-inline-block.mr-3').toArray()[0];
                     if (allStars) {
-                        result.allStars = parseInt((allStars.children[2] as any).data, 10);
+                        result.allStars = parseInt((allStars.children[2] as any).data.replace(/,/g, ''), 10);
                     }
 
                     // extract todays stars
                     const todaysStars = domElem.find('.f6.text-gray.mt-2 > span:last-child').toArray()[0];
                     if (todaysStars) {
-                        const numStars = (todaysStars.children[2] as any).data.match(RE_DIGITS);
+                        const numStars = (todaysStars.children[2] as any).data.replace(/,/g, '').match(RE_DIGITS);
                         if (numStars !== null) {
                             result.todaysStars =  parseInt(numStars, 10);
                         }
