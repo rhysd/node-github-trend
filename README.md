@@ -8,17 +8,17 @@ Scraping GitHub Trending Repositories
 ## Only scraping
 
 ```javascript
-var Trending = require("github-trend");
-var scraper = new Trending.Scraper();
+const Trending = require("github-trend");
+const scraper = new Trending.Scraper();
 
 // Empty string means 'all languages'
-scraper.scrapeTrendingRepos("").then(function(repos){
+scraper.scrapeTrendingRepos("").then(repos => {
     repos.forEach(function(repo){
         console.log(repo.owner);
         console.log(repo.name);
     });
-}).catch(function(err){
-    console.log(err.message);
+}).catch(err => {
+    console.error(err.message);
 });
 
 // For other languages
@@ -27,16 +27,17 @@ scrapeTrendingRepos("vim");
 scrapeTrendingRepos("go");
 ```
 
-`Scraper` only scrapes GitHub trending page. This returns an array of repository information.  This method is relatively faster because of sending request only once per language.
+`Scraper` only scrapes GitHub trending page. This returns an array of repository information.
+This method is relatively faster because of sending request only once per language.
 
 ## Scrape and get more info (in one request,without api calls)
 ```javascript
-var Trending = require("github-trend");
-var scraper = new Trending.Scraper();
+const Trending = require("github-trend");
+const scraper = new Trending.Scraper();
 
 // Empty string means 'all languages'
-scraper.scrapeTrendingReposFullInfo("").then(function(repos){
-    repos.forEach(function(repo){
+scraper.scrapeTrendingReposFullInfo("").then(repos => {
+    for (const repo of repos) {
         console.log(repo.owner);
         console.log(repo.name);
         console.log(repo.description);
@@ -44,9 +45,9 @@ scraper.scrapeTrendingReposFullInfo("").then(function(repos){
         console.log(repo.allStars);
         console.log(repo.todaysStars);
         console.log(repo.forks);
-    });
-}).catch(function(err){
-    console.log(err.message);
+    }
+}).catch(err => {
+    console.error(err.message);
 });
 
 // For other languages
@@ -59,28 +60,28 @@ scraper.scrapeTrendingReposFullInfo("go");
 ## Scraping and getting full repository information
 
 ```javascript
-var Trending = require("github-trend");
-var client = new Trending.Client();
+const Trending = require("github-trend");
+const client = new Trending.Client();
 
-client.fetchTrending("").then(function(repos){
-    repos.forEach(function(repo){
+client.fetchTrending("").then(repos => {
+    for (const repo of repos) {
         // Result of https://api.github.com/repos/:user/:name
         console.log(repo);
-    });
-}).catch(function(err){
-    console.log(err.message);
+    }
+}).catch(err => {
+    console.error(err.message);
 });
 
 // Fetch all API call asynchronously
-client.fetchTrendings(["", "vim", "go"]).then(function(repos){
-    for (var lang in repos) {
-        repos[lang].forEach(function(repo){
+client.fetchTrendings(["", "vim", "go"]).then(repos => {
+    for (const lang in repos) {
+        for (const repo of repos[lang]) {
             // Result of https://api.github.com/repos/:user/:name
             console.log(repo);
-        });
+        }
     }
-}).catch(function(err){
-    console.log(err.message);
+}).catch(err => {
+    console.error(err.message);
 });
 ```
 
@@ -90,16 +91,16 @@ This takes more time than only scraping, but all requests are sent asynchronousl
 ## Scraping language information
 
 ```javascript
-var Trending = require("github-trend");
-var scraper = new Trending.Scraper();
+const Trending = require("github-trend");
+const scraper = new Trending.Scraper();
 
-scraper.scrapeLanguageYAML().then(function(langs){
+scraper.scrapeLanguageYAML().then(langs => {
     for (const name in langs) {
         console.log(name);
         console.log(langs[name]);
     }
-}).catch(function(err){
-    console.log(err.message);
+}).catch(err => {
+    console.error(err.message);
 });
 ```
 
@@ -109,25 +110,25 @@ The result is cached and reused.
 ## Scraping language color
 
 ```javascript
-var Trending = require("github-trend");
-var scraper = new Trending.Scraper();
+const Trending = require("github-trend");
+const scraper = new Trending.Scraper();
 
-scraper.scrapeLanguageColors().then(function(colors){
+scraper.scrapeLanguageColors().then(colors => {
     for (const name in colors) {
         console.log("name: " + name);
         console.log("color: " + colors[name]);
     }
-}).catch(function(err){
-    console.log(err.message);
+}).catch(err => {
+    console.error(err.message);
 });
 
 // If you want only language names:
-scraper.scrapeLanguageNames().then(function(names){
-    names.forEach(function(name){
+scraper.scrapeLanguageNames().then(names => {
+    for (const name of names) {
         console.log(name);
-    });
-}).catch(function(err){
-    console.log(err.message);
+    }
+}).catch(err => {
+    console.error(err.message);
 });
 ```
 
