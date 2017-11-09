@@ -1,6 +1,6 @@
 {
   "name": "github-trend",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "node.js library for GitHub trending repositories",
   "main": "./build/main.js",
   "author": "rhysd <lin90162@yahoo.co.jp>",
