@@ -43,6 +43,7 @@ scraper.scrapeTrendingReposFullInfo("").then(function(repos){
         console.log(repo.language);
         console.log(repo.allStars);
         console.log(repo.todaysStars);
+        console.log(repo.forks);
     });
 }).catch(function(err){
     console.log(err.message);
