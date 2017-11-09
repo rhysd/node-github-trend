@@ -36,6 +36,7 @@ export interface FullRepository {
     language: string | null;
     allStars: number;
     todaysStars: number;
+    forks: number;
     [k: string]: string | number;
 }
 
@@ -95,6 +96,7 @@ export class Scraper {
                         language: null,
                         allStars: null,
                         todaysStars: null,
+                        forks: null,
                     } as FullRepository;
                     //extract owner and repo name
                     const domElem = dom(li);
@@ -120,10 +122,18 @@ export class Scraper {
                         result.language = (lang.children[0] as any).data;
                     }
 
+                    const counts = domElem.find('.muted-link.d-inline-block.mr-3').toArray();
+
                     // extract all stars
-                    const allStars = domElem.find('.muted-link.d-inline-block.mr-3').toArray()[0];
+                    const allStars = counts[0];
                     if (allStars) {
                         result.allStars = parseInt((allStars.children[2] as any).data.replace(/,/g, ''), 10);
+                    }
+
+                    // extract number of forks
+                    const forks = counts[1];
+                    if (forks) {
+                        result.forks = parseInt((allStars.children[2] as any).data.replace(/,/g, ''), 10);
                     }
 
                     // extract todays stars
