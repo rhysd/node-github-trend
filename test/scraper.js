@@ -15,7 +15,11 @@ describe('Scraper', function() {
                 neq(repo.owner, null, msg);
                 neq(repo.language, undefined, msg);
                 neq(repo.allStars, null, msg);
+                assert(repo.allStars >= 0, msg);
                 neq(repo.todaysStars, null, msg);
+                assert(repo.todaysStars >= 0, msg);
+                neq(repo.forks, null, msg);
+                assert(repo.forks >= 0, msg);
             }
         });
     });
