@@ -26,7 +26,7 @@ export interface FullRepository {
     language: string;
     allStars: string;
     todaysStars: string;
-    forks: number;
+    forks?: number;
     [k: string]: string | number;
 }
 export declare class Scraper {

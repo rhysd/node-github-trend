@@ -46,7 +46,7 @@ const RE_COMMA = /,/g;
 
 export class Scraper {
     config: ScraperConfig;
-    cache: Object;
+    cache: object;
 
     constructor(config?: ScraperConfig) {
         this.config = config || {};
@@ -66,7 +66,7 @@ export class Scraper {
             opts.proxy = this.config.proxy;
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             request(opts, (err, res, body) => {
                 if (err) {
                     reject(err);

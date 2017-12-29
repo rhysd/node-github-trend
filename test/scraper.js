@@ -18,8 +18,9 @@ describe('Scraper', function() {
                 assert(repo.allStars >= 0, msg);
                 neq(repo.todaysStars, null, msg);
                 assert(repo.todaysStars >= 0, msg);
-                neq(repo.forks, null, msg);
-                assert(repo.forks >= 0, msg);
+                if (repo.forks) {
+                    assert(repo.forks >= 0, msg);
+                }
             }
         });
     });

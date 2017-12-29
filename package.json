@@ -18,13 +18,14 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@types/es6-promise": "0.0.33",
     "cheerio": "^0.19.0",
-    "es6-promise": "^4.1.1",
+    "es6-promise": "^4.2.2",
     "js-yaml": "^3.10.0",
-    "request": "^2.81.0"
+    "request": "^2.83.0"
   },
   "devDependencies": {
-    "mocha": "^3.5.3",
-    "typescript": "~2.1.5"
+    "mocha": "^4.1.0",
+    "typescript": "~2.6.2"
   }
 }
