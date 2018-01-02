@@ -24,10 +24,11 @@ export interface FullRepository {
     owner: string;
     description: string | null;
     language: string;
+    langColor: string | null;
     allStars: string;
     todaysStars: string;
-    forks?: number;
-    [k: string]: string | number;
+    forks: number | null;
+    [k: string]: string | number | null;
 }
 export declare class Scraper {
     config: ScraperConfig;

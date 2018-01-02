@@ -2,6 +2,8 @@ const assert = require('assert');
 const neq = assert.notStrictEqual;
 const Scraper = require('../build/main').Scraper;
 
+const RE_COLOR = /^#[0-9A-Fa-f]{6}$/i
+
 describe('Scraper', function() {
     this.timeout(10000);
 
@@ -21,6 +23,11 @@ describe('Scraper', function() {
                 if (repo.forks) {
                     assert(repo.forks >= 0, msg);
                 }
+                if (repo.langColor) {
+                    assert(RE_COLOR.test(repo.langColor), msg)
+                } else {
+                    assert(repo.langColor === null, msg);
+                }
             }
         });
     });
@@ -31,7 +38,7 @@ describe('Scraper', function() {
             for (const name in langs) {
                 assert(name);
                 const color = langs[name];
-                assert((/#[0-9a-f]{6}/i).test(color));
+                assert(RE_COLOR.test(color));
             }
         });
     });

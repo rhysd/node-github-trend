@@ -95,6 +95,7 @@ export class Scraper {
                         owner: null,
                         description: null,
                         language: null,
+                        langColor: null,
                         allStars: null,
                         todaysStars: null,
                         forks: null,
@@ -121,6 +122,15 @@ export class Scraper {
                     const lang = domElem.find('[itemprop="programmingLanguage"]').toArray()[0];
                     if (lang) {
                         result.language = (lang.children[0] as any).data;
+                    }
+
+                    const langColor = domElem.find('.repo-language-color')[0];
+                    if (langColor) {
+                        const style = langColor.attribs.style;
+                        if (style.indexOf('background-color:#') === 0) {
+                            // -1 means stripping the last ';'
+                            result.langColor = style.slice('background-color:'.length, -1);
+                        }
                     }
 
                     const counts = domElem.find('.muted-link.d-inline-block.mr-3').toArray();
