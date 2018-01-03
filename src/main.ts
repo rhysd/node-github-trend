@@ -83,110 +83,115 @@ export class Scraper {
         });
     }
 
-    scrapeTrendingReposFullInfo (lang_name:string) {
-        return this.fetchTrendPage(lang_name).then((html:string)=> {
+    scrapeTrendingReposFullInfo(lang_name: string) {
+        return this.fetchTrendPage(lang_name).then((html: string)=> {
+            const results = [];
             const dom = cheerio.load(html);
-            return dom(".repo-list li")
-                .toArray()
-                .map(function (li, i) {
-                    const result = {
-                        index: i,
-                        name: null,
-                        owner: null,
-                        description: null,
-                        language: null,
-                        langColor: null,
-                        allStars: null,
-                        todaysStars: null,
-                        forks: null,
-                    } as FullRepository;
+            const items = dom(".repo-list li");
+            for (let i = 0; i < items.length; i++) {
+                const li = items[i];
+                const result = {
+                    index: i,
+                    name: null,
+                    owner: null,
+                    description: null,
+                    language: null,
+                    langColor: null,
+                    allStars: null,
+                    todaysStars: null,
+                    forks: null,
+                } as FullRepository;
 
-                    //extract owner and repo name
-                    const domElem = dom(li);
-                    const a = domElem.find('h3 a').toArray()[0];
+                //extract owner and repo name
+                const domElem = dom(li);
+                const a = domElem.find('h3 a')[0];
 
-                    const href: string = (a.attribs as any)['href'];
-                    const match = href.match(RE_HREF_SCRAPE);
+                const href: string = (a.attribs as any)['href'];
+                const match = href.match(RE_HREF_SCRAPE);
 
-                    if (match) {
-                        result.owner = match[1];
-                        result.name = match[2];
+                if (match) {
+                    result.owner = match[1];
+                    result.name = match[2];
+                }
+
+                // extract description
+                const p = domElem.find('p')[0];
+                if (p) {
+                    result.description = (p.children[0] as any).data;
+                }
+
+                // extract programming language
+                const lang = domElem.find('[itemprop="programmingLanguage"]')[0];
+                if (lang) {
+                    result.language = (lang.children[0] as any).data;
+                }
+
+                const langColor = domElem.find('.repo-language-color')[0];
+                if (langColor) {
+                    const style = langColor.attribs.style;
+                    if (style.indexOf('background-color:#') === 0) {
+                        // -1 means stripping the last ';'
+                        result.langColor = style.slice('background-color:'.length, -1);
                     }
+                }
 
-                    // extract description
-                    const p = domElem.find('p').toArray()[0];
-                    if (p) {
-                        result.description = (p.children[0] as any).data;
+                const counts = domElem.find('.muted-link.d-inline-block.mr-3');
+
+                // extract all stars
+                const allStars = counts[0];
+                if (allStars) {
+                    result.allStars = parseInt((allStars.children[2] as any).data.replace(RE_COMMA, ''), 10);
+                }
+
+                // extract number of forks
+                const forks = counts[1];
+                if (forks) {
+                    result.forks = parseInt((allStars.children[2] as any).data.replace(RE_COMMA, ''), 10);
+                }
+
+                // extract todays stars
+                const todaysStars = domElem.find('.f6.text-gray.mt-2 > span:last-child')[0];
+                if (todaysStars) {
+                    const numStars = (todaysStars.children[2] as any).data.replace(RE_COMMA, '').match(RE_DIGITS);
+                    if (numStars !== null) {
+                        result.todaysStars =  parseInt(numStars, 10);
                     }
+                }
 
-                    // extract programming language
-                    const lang = domElem.find('[itemprop="programmingLanguage"]').toArray()[0];
-                    if (lang) {
-                        result.language = (lang.children[0] as any).data;
+                //clean result
+                const keys = Object.keys(result);
+                keys.forEach(k => {
+                    const v = result[k];
+                    if (typeof v === 'string') {
+                        result[k] = v.trim();
                     }
-
-                    const langColor = domElem.find('.repo-language-color')[0];
-                    if (langColor) {
-                        const style = langColor.attribs.style;
-                        if (style.indexOf('background-color:#') === 0) {
-                            // -1 means stripping the last ';'
-                            result.langColor = style.slice('background-color:'.length, -1);
-                        }
-                    }
-
-                    const counts = domElem.find('.muted-link.d-inline-block.mr-3').toArray();
-
-                    // extract all stars
-                    const allStars = counts[0];
-                    if (allStars) {
-                        result.allStars = parseInt((allStars.children[2] as any).data.replace(RE_COMMA, ''), 10);
-                    }
-
-                    // extract number of forks
-                    const forks = counts[1];
-                    if (forks) {
-                        result.forks = parseInt((allStars.children[2] as any).data.replace(RE_COMMA, ''), 10);
-                    }
-
-                    // extract todays stars
-                    const todaysStars = domElem.find('.f6.text-gray.mt-2 > span:last-child').toArray()[0];
-                    if (todaysStars) {
-                        const numStars = (todaysStars.children[2] as any).data.replace(RE_COMMA, '').match(RE_DIGITS);
-                        if (numStars !== null) {
-                            result.todaysStars =  parseInt(numStars, 10);
-                        }
-                    }
-
-                    //clean result
-                    const keys = Object.keys(result);
-                    keys.forEach(k => {
-                        const v = result[k];
-                        if (typeof v === 'string') {
-                            result[k] = v.trim();
-                        }
-                    });
-
-                    return result;
                 });
+
+                results.push(result);
+            }
+            return results;
         });
     };
 
     scrapeTrendingRepos(lang_name: string) {
         return this.fetchTrendPage(lang_name).then((html: string) => {
             const dom = cheerio.load(html);
-            return dom(".repo-list h3 a")
-                            .toArray()
-                            .map((a: any) => {
-                                const href: string = a.attribs["href"];
-                                const match = href.match(RE_HREF_SCRAPE)
-                                if (!match) {
-                                    console.log("Invalid repo: " + href);
-                                }
-                                return {
-                                    owner: match[1],
-                                    name: match[2],
-                                };
-                            });
+            const links = dom(".repo-list h3 a");
+            const repos = [];
+            for (let i = 0; i < links.length; i++) {
+                const a = links[i];
+                const href: string = a.attribs["href"];
+                const match = href.match(RE_HREF_SCRAPE)
+                if (!match) {
+                    // Ignore parse failures
+                    continue;
+                }
+                repos.push({
+                    owner: match[1],
+                    name: match[2],
+                })
+            }
+            return repos;
         });
     }
 
@@ -245,7 +250,7 @@ export class Scraper {
     scrapeLanguageNames() {
         return this.fetchLanguageYAML().then((langs: Languages) => {
             const result: string[] = [];
-            for (const name in langs) {
+            for (const name of Object.keys(langs)) {
                 result.push(name);
                 const lang: Language = langs[name];
                 if (!lang.color) {
