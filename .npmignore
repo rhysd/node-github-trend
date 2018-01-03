@@ -1,5 +1,5 @@
-Guardfile
-tsd.json
-typings
-node_modules
-src
+/node_modules
+/src
+/test
+/.travis.yml
+/.npmrc
