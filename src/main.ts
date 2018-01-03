@@ -106,7 +106,7 @@ export class Scraper {
                 const domElem = dom(li);
                 const a = domElem.find('h3 a')[0];
 
-                const href: string = (a.attribs as any)['href'];
+                const href: string = a.attribs['href'];
                 const match = href.match(RE_HREF_SCRAPE);
 
                 if (match) {
@@ -117,13 +117,13 @@ export class Scraper {
                 // extract description
                 const p = domElem.find('p')[0];
                 if (p) {
-                    result.description = (p.children[0] as any).data;
+                    result.description = p.children[0].data;
                 }
 
                 // extract programming language
                 const lang = domElem.find('[itemprop="programmingLanguage"]')[0];
                 if (lang) {
-                    result.language = (lang.children[0] as any).data;
+                    result.language = lang.children[0].data;
                 }
 
                 const langColor = domElem.find('.repo-language-color')[0];
@@ -140,21 +140,21 @@ export class Scraper {
                 // extract all stars
                 const allStars = counts[0];
                 if (allStars) {
-                    result.allStars = parseInt((allStars.children[2] as any).data.replace(RE_COMMA, ''), 10);
+                    result.allStars = parseInt(allStars.children[2].data.replace(RE_COMMA, ''), 10);
                 }
 
                 // extract number of forks
                 const forks = counts[1];
                 if (forks) {
-                    result.forks = parseInt((allStars.children[2] as any).data.replace(RE_COMMA, ''), 10);
+                    result.forks = parseInt(allStars.children[2].data.replace(RE_COMMA, ''), 10);
                 }
 
                 // extract todays stars
                 const todaysStars = domElem.find('.f6.text-gray.mt-2 > span:last-child')[0];
                 if (todaysStars) {
-                    const numStars = (todaysStars.children[2] as any).data.replace(RE_COMMA, '').match(RE_DIGITS);
+                    const numStars = todaysStars.children[2].data.replace(RE_COMMA, '').match(RE_DIGITS);
                     if (numStars !== null) {
-                        result.todaysStars =  parseInt(numStars, 10);
+                        result.todaysStars =  parseInt(numStars[0], 10);
                     }
                 }
 
@@ -275,7 +275,7 @@ export class Client {
         this.token = token || null;
     }
 
-    fetchGetAPI(repo: RepositoryEntry) {
+    fetchGetRepoAPI(repo: RepositoryEntry) {
         return new Promise((resolve, reject) => {
             const headers: {[h: string]: string} = {
                     "User-Agent": "request",
@@ -319,7 +319,7 @@ export class Client {
 
     fetchTrending(lang: string) {
         return this.scraper.scrapeTrendingRepos(lang).then((repos: RepositoryEntry[]) => {
-            return Promise.all(repos.map(r => this.fetchGetAPI(r)));
+            return Promise.all(repos.map(r => this.fetchGetRepoAPI(r)));
         });
     }
 
