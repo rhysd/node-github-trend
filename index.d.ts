@@ -25,8 +25,8 @@ export interface FullRepository {
     description: string | null;
     language: string;
     langColor: string | null;
-    allStars: string;
-    todaysStars: string;
+    allStars: number;
+    todaysStars: number;
     forks: number | null;
     [k: string]: string | number | null;
 }
