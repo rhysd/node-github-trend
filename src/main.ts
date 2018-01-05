@@ -46,7 +46,7 @@ const RE_COMMA = /,/g;
 
 export class Scraper {
     config: ScraperConfig;
-    cache: object;
+    private cache: object;
 
     constructor(config?: ScraperConfig) {
         this.config = config || {};
