@@ -1,6 +1,6 @@
-import * as request from "request";
-import * as cheerio from "cheerio";
-import * as yaml from "js-yaml";
+import * as request from 'request';
+import * as cheerio from 'cheerio';
+import * as yaml from 'js-yaml';
 
 export interface RepositoryEntry {
     owner: string;
@@ -55,11 +55,11 @@ export class Scraper {
 
     fetchTrendPage(lang_name: string) {
         const opts: request.Options = {
-            url: "https://github.com/trending"
+            url: 'https://github.com/trending'
         };
 
         if (lang_name) {
-            opts.url += "?l=" + lang_name;
+            opts.url += '?l=' + lang_name;
         }
 
         if (this.config.proxy) {
@@ -74,7 +74,7 @@ export class Scraper {
                 }
 
                 if (res.statusCode !== 200) {
-                    reject(new Error("Invalid status: " + res.statusCode));
+                    reject(new Error('Invalid status: ' + res.statusCode));
                     return;
                 }
 
@@ -84,10 +84,10 @@ export class Scraper {
     }
 
     scrapeTrendingReposFullInfo(lang_name: string) {
-        return this.fetchTrendPage(lang_name).then((html: string)=> {
+        return this.fetchTrendPage(lang_name).then((html: string) => {
             const results = [];
             const dom = cheerio.load(html);
-            const items = dom(".repo-list li");
+            const items = dom('.repo-list li');
             for (let i = 0; i < items.length; i++) {
                 const li = items[i];
                 const result = {
@@ -102,11 +102,10 @@ export class Scraper {
                     forks: null,
                 } as FullRepository;
 
-                //extract owner and repo name
                 const domElem = dom(li);
                 const a = domElem.find('h3 a')[0];
 
-                const href: string = a.attribs['href'];
+                const href: string = a.attribs.href;
                 const match = href.match(RE_HREF_SCRAPE);
 
                 if (match) {
@@ -158,7 +157,7 @@ export class Scraper {
                     }
                 }
 
-                //clean result
+                // Cleanup result
                 const keys = Object.keys(result);
                 keys.forEach(k => {
                     const v = result[k];
@@ -171,17 +170,19 @@ export class Scraper {
             }
             return results;
         });
-    };
+    }
 
     scrapeTrendingRepos(lang_name: string) {
         return this.fetchTrendPage(lang_name).then((html: string) => {
             const dom = cheerio.load(html);
-            const links = dom(".repo-list h3 a");
+            const links = dom('.repo-list h3 a');
             const repos = [];
+            /* tslint:disable:prefer-for-of */
             for (let i = 0; i < links.length; i++) {
+            /* tslint:enable:prefer-for-of */
                 const a = links[i];
-                const href: string = a.attribs["href"];
-                const match = href.match(RE_HREF_SCRAPE)
+                const href: string = a.attribs.href;
+                const match = href.match(RE_HREF_SCRAPE);
                 if (!match) {
                     // Ignore parse failures
                     continue;
@@ -189,7 +190,7 @@ export class Scraper {
                 repos.push({
                     owner: match[1],
                     name: match[2],
-                })
+                });
             }
             return repos;
         });
@@ -202,7 +203,7 @@ export class Scraper {
 
         return new Promise((resolve, reject) => {
             const opts: request.Options = {
-                url: "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml"
+                url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml'
             };
 
             if (this.config.proxy) {
@@ -216,12 +217,12 @@ export class Scraper {
                 }
 
                 if (res.statusCode !== 200) {
-                    reject(new Error("Invalid status: " + res.statusCode));
+                    reject(new Error('Invalid status: ' + res.statusCode));
                     return;
                 }
 
                 const langs: Languages = yaml.safeLoad(body);
-                this.cache = langs
+                this.cache = langs;
                 resolve(langs);
             });
         });
@@ -278,17 +279,17 @@ export class Client {
     fetchGetRepoAPI(repo: RepositoryEntry) {
         return new Promise((resolve, reject) => {
             const headers: {[h: string]: string} = {
-                    "User-Agent": "request",
-                    "Accept" : "application/vnd.github.v3+json"
+                    'User-Agent': 'request',
+                    Accept : 'application/vnd.github.v3+json'
                 };
 
             if (this.token) {
-                headers['Authorization'] = 'token ' + this.token;
+                headers.Authorization = 'token ' + this.token;
             }
 
             const opts: request.Options = {
                 url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
-                headers: headers
+                headers
             };
 
             if (this.scraper.config.proxy) {
@@ -302,7 +303,7 @@ export class Client {
                 }
 
                 if (res.statusCode !== 200) {
-                    reject(new Error("Invalid status: " + res.statusCode));
+                    reject(new Error('Invalid status: ' + res.statusCode));
                     return;
                 }
 
@@ -310,7 +311,7 @@ export class Client {
                 // Sometimes response json may be broken and crashed parser
                 try {
                     resolve(JSON.parse(body));
-                } catch(e) {
+                } catch (e) {
                     reject(e);
                 }
             });
@@ -325,11 +326,11 @@ export class Client {
 
     fetchAppendingReadme(repo: {[key: string]: any}) {
         return new Promise(resolve => {
-            const readme_url = repo['html_url'] + '/blob/' + repo['default_branch'] + '/README.md';
-            let opts: request.Options = {
+            const readme_url = repo.html_url + '/blob/' + repo.default_branch + '/README.md';
+            const opts: request.Options = {
                 url: readme_url,
                 method: 'HEAD',
-            }
+            };
 
             if (this.scraper.config.proxy) {
                 opts.proxy = this.scraper.config.proxy;
@@ -346,7 +347,7 @@ export class Client {
                     return;
                 }
 
-                repo['readme_url'] = readme_url;
+                repo.readme_url = readme_url;
                 resolve(repo);
             });
         });
@@ -361,10 +362,10 @@ export class Client {
     fetchTrendingsWithReadme(langs: string[]) {
         return Promise.all(langs.map(l => this.fetchTrendingWithReadme(l)))
                       .then((trendings: Repository[][]) => {
-                          let result: Repositories = {};
-                          for (const idx in langs) {
-                              result[langs[idx]] = trendings[idx];
-                          }
+                          const result: Repositories = {};
+                          langs.forEach((lang, idx) => {
+                              result[lang] = trendings[idx];
+                          });
                           return result;
                       });
     }
@@ -372,10 +373,10 @@ export class Client {
     fetchTrendings(langs: string[]) {
         return Promise.all(langs.map(l => this.fetchTrending(l)))
                       .then((trendings: Repository[][]) => {
-                          let result: Repositories = {};
-                          for (const idx in langs) {
-                              result[langs[idx]] = trendings[idx];
-                          }
+                          const result: Repositories = {};
+                          langs.forEach((lang, idx) => {
+                              result[lang] = trendings[idx];
+                          });
                           return result;
                       });
     }
