@@ -9,6 +9,7 @@
     "watch": "tsc --pretty -p src/ --watch",
     "dts": "tsc -p src/ -d --outDir ./",
     "lint": "tslint -p src/",
+    "fmt": "prettier 'src/**/*.ts'",
     "test": "mocha test/"
   },
   "repository": {
@@ -32,6 +33,7 @@
     "@types/node": "^8.5.2",
     "@types/request": "^2.0.9",
     "mocha": "^4.1.0",
+    "prettier": "^1.9.2",
     "tslint": "^5.8.0",
     "typescript": "~2.6.2"
   }

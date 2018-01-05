@@ -55,7 +55,7 @@ export class Scraper {
 
     fetchTrendPage(lang_name: string) {
         const opts: request.Options = {
-            url: 'https://github.com/trending'
+            url: 'https://github.com/trending',
         };
 
         if (lang_name) {
@@ -153,7 +153,7 @@ export class Scraper {
                 if (todaysStars) {
                     const numStars = todaysStars.children[2].data.replace(RE_COMMA, '').match(RE_DIGITS);
                     if (numStars !== null) {
-                        result.todaysStars =  parseInt(numStars[0], 10);
+                        result.todaysStars = parseInt(numStars[0], 10);
                     }
                 }
 
@@ -179,7 +179,7 @@ export class Scraper {
             const repos = [];
             /* tslint:disable:prefer-for-of */
             for (let i = 0; i < links.length; i++) {
-            /* tslint:enable:prefer-for-of */
+                /* tslint:enable:prefer-for-of */
                 const a = links[i];
                 const href: string = a.attribs.href;
                 const match = href.match(RE_HREF_SCRAPE);
@@ -203,7 +203,7 @@ export class Scraper {
 
         return new Promise((resolve, reject) => {
             const opts: request.Options = {
-                url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml'
+                url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml',
             };
 
             if (this.config.proxy) {
@@ -230,7 +230,7 @@ export class Scraper {
 
     scrapeLanguageColors() {
         return this.fetchLanguageYAML().then((langs: Languages) => {
-            const result: {[key: string]: string} = {};
+            const result: { [key: string]: string } = {};
             for (const name in langs) {
                 const lang: Language = langs[name];
                 if (!lang.color) {
@@ -278,10 +278,10 @@ export class Client {
 
     fetchGetRepoAPI(repo: RepositoryEntry) {
         return new Promise((resolve, reject) => {
-            const headers: {[h: string]: string} = {
-                    'User-Agent': 'request',
-                    Accept : 'application/vnd.github.v3+json'
-                };
+            const headers: { [h: string]: string } = {
+                'User-Agent': 'request',
+                Accept: 'application/vnd.github.v3+json',
+            };
 
             if (this.token) {
                 headers.Authorization = 'token ' + this.token;
@@ -289,7 +289,7 @@ export class Client {
 
             const opts: request.Options = {
                 url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
-                headers
+                headers,
             };
 
             if (this.scraper.config.proxy) {
@@ -324,7 +324,7 @@ export class Client {
         });
     }
 
-    fetchAppendingReadme(repo: {[key: string]: any}) {
+    fetchAppendingReadme(repo: { [key: string]: any }) {
         return new Promise(resolve => {
             const readme_url = repo.html_url + '/blob/' + repo.default_branch + '/README.md';
             const opts: request.Options = {
@@ -360,25 +360,22 @@ export class Client {
     }
 
     fetchTrendingsWithReadme(langs: string[]) {
-        return Promise.all(langs.map(l => this.fetchTrendingWithReadme(l)))
-                      .then((trendings: Repository[][]) => {
-                          const result: Repositories = {};
-                          langs.forEach((lang, idx) => {
-                              result[lang] = trendings[idx];
-                          });
-                          return result;
-                      });
+        return Promise.all(langs.map(l => this.fetchTrendingWithReadme(l))).then((trendings: Repository[][]) => {
+            const result: Repositories = {};
+            langs.forEach((lang, idx) => {
+                result[lang] = trendings[idx];
+            });
+            return result;
+        });
     }
 
     fetchTrendings(langs: string[]) {
-        return Promise.all(langs.map(l => this.fetchTrending(l)))
-                      .then((trendings: Repository[][]) => {
-                          const result: Repositories = {};
-                          langs.forEach((lang, idx) => {
-                              result[lang] = trendings[idx];
-                          });
-                          return result;
-                      });
+        return Promise.all(langs.map(l => this.fetchTrending(l))).then((trendings: Repository[][]) => {
+            const result: Repositories = {};
+            langs.forEach((lang, idx) => {
+                result[lang] = trendings[idx];
+            });
+            return result;
+        });
     }
 }
-
