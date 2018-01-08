@@ -9,8 +9,9 @@
     "watch": "tsc --pretty -p src/ --watch",
     "dts": "tsc -p src/ -d --outDir ./",
     "lint": "tslint -p src/",
-    "fmt": "prettier 'src/**/*.ts'",
-    "test": "mocha test/"
+    "fmt": "prettier --write 'src/**/*.ts'",
+    "test": "mocha test/",
+    "preversion": "npm run fmt && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -22,16 +23,14 @@
   "license": "MIT",
   "dependencies": {
     "cheerio": "^0.22.0",
-    "es6-promise": "^4.2.2",
     "gzip-js": "^0.3.2",
     "js-yaml": "^3.10.0",
     "request": "^2.83.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.6",
-    "@types/es6-promise": "0.0.33",
     "@types/js-yaml": "^3.10.1",
-    "@types/node": "^8.5.2",
+    "@types/node": "^9.3.0",
     "@types/request": "^2.0.9",
     "mocha": "^4.1.0",
     "prettier": "^1.9.2",

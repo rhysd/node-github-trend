@@ -13,6 +13,7 @@
     "noEmitOnError": true,
     "strictNullChecks": false,
     "target": "es5",
+    "lib": ["es5", "dom", "scripthost", "es2015.promise"],
     "sourceMap": true
   },
   "include": [
