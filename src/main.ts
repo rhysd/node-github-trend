@@ -1,6 +1,7 @@
 import * as request from 'request';
 import * as cheerio from 'cheerio';
 import * as yaml from 'js-yaml';
+import { unzip } from 'gzip-js';
 
 export interface RepositoryEntry {
     owner: string;
@@ -17,6 +18,7 @@ export interface Repositories {
 
 export interface ScraperConfig {
     proxy?: string;
+    useGzip?: boolean;
 }
 
 export interface Language {
@@ -44,6 +46,38 @@ const RE_HREF_SCRAPE = /^\/([^\/]+)\/([^\/]+)$/;
 const RE_DIGITS = /\d+/;
 const RE_COMMA = /,/g;
 
+function fetchRequest(opts: request.Options, useGzip: boolean) {
+    if (useGzip) {
+        opts.headers = opts.headers || {};
+        opts.headers['Accept-Encoding'] = 'gzip';
+        opts.encoding = null;
+    }
+
+    return new Promise<string>((resolve, reject) => {
+        request(opts, (err, res, body) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            if (res.statusCode !== 200) {
+                reject(new Error('Invalid status: ' + res.statusCode));
+                return;
+            }
+
+            if (useGzip) {
+                resolve(
+                    unzip(body)
+                        .map(c => String.fromCharCode(c))
+                        .join(''),
+                );
+            } else {
+                resolve(body);
+            }
+        });
+    });
+}
+
 export class Scraper {
     config: ScraperConfig;
     private cache: object;
@@ -66,21 +100,7 @@ export class Scraper {
             opts.proxy = this.config.proxy;
         }
 
-        return new Promise<string>((resolve, reject) => {
-            request(opts, (err, res, body) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                if (res.statusCode !== 200) {
-                    reject(new Error('Invalid status: ' + res.statusCode));
-                    return;
-                }
-
-                resolve(body);
-            });
-        });
+        return fetchRequest(opts, !!this.config.useGzip);
     }
 
     scrapeTrendingReposFullInfo(lang_name: string) {
@@ -201,30 +221,18 @@ export class Scraper {
             return Promise.resolve(this.cache);
         }
 
-        return new Promise((resolve, reject) => {
-            const opts: request.Options = {
-                url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml',
-            };
+        const opts: request.Options = {
+            url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml',
+        };
 
-            if (this.config.proxy) {
-                opts.proxy = this.config.proxy;
-            }
+        if (this.config.proxy) {
+            opts.proxy = this.config.proxy;
+        }
 
-            request(opts, (err, res, body) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                if (res.statusCode !== 200) {
-                    reject(new Error('Invalid status: ' + res.statusCode));
-                    return;
-                }
-
-                const langs: Languages = yaml.safeLoad(body);
-                this.cache = langs;
-                resolve(langs);
-            });
+        return fetchRequest(opts, !!this.config.useGzip).then(body => {
+            const langs: Languages = yaml.safeLoad(body);
+            this.cache = langs;
+            return langs;
         });
     }
 
@@ -277,45 +285,25 @@ export class Client {
     }
 
     fetchGetRepoAPI(repo: RepositoryEntry) {
-        return new Promise((resolve, reject) => {
-            const headers: { [h: string]: string } = {
-                'User-Agent': 'request',
-                Accept: 'application/vnd.github.v3+json',
-            };
+        const headers: { [h: string]: string } = {
+            'User-Agent': 'request',
+            Accept: 'application/vnd.github.v3+json',
+        };
 
-            if (this.token) {
-                headers.Authorization = 'token ' + this.token;
-            }
+        if (this.token) {
+            headers.Authorization = 'token ' + this.token;
+        }
 
-            const opts: request.Options = {
-                url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
-                headers,
-            };
+        const opts: request.Options = {
+            url: `https://api.github.com/repos/${repo.owner}/${repo.name}`,
+            headers,
+        };
 
-            if (this.scraper.config.proxy) {
-                opts.proxy = this.scraper.config.proxy;
-            }
+        if (this.scraper.config.proxy) {
+            opts.proxy = this.scraper.config.proxy;
+        }
 
-            request(opts, (err, res, body) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                if (res.statusCode !== 200) {
-                    reject(new Error('Invalid status: ' + res.statusCode));
-                    return;
-                }
-
-                // Note:
-                // Sometimes response json may be broken and crashed parser
-                try {
-                    resolve(JSON.parse(body));
-                } catch (e) {
-                    reject(e);
-                }
-            });
-        });
+        return fetchRequest(opts, !!this.scraper.config.useGzip).then(body => JSON.parse(body));
     }
 
     fetchTrending(lang: string) {
@@ -325,32 +313,23 @@ export class Client {
     }
 
     fetchAppendingReadme(repo: { [key: string]: any }) {
-        return new Promise(resolve => {
-            const readme_url = repo.html_url + '/blob/' + repo.default_branch + '/README.md';
-            const opts: request.Options = {
-                url: readme_url,
-                method: 'HEAD',
-            };
+        const readme_url = `${repo.html_url}/blob/${repo.default_branch}/README.md`;
+        const opts: request.Options = {
+            url: readme_url,
+            method: 'HEAD',
+        };
 
-            if (this.scraper.config.proxy) {
-                opts.proxy = this.scraper.config.proxy;
-            }
+        if (this.scraper.config.proxy) {
+            opts.proxy = this.scraper.config.proxy;
+        }
 
-            request(opts, (err, res, _) => {
-                if (err) {
-                    resolve(repo);
-                    return;
-                }
-
-                if (res.statusCode !== 200) {
-                    resolve(repo);
-                    return;
-                }
-
+        return fetchRequest(opts, !!this.scraper.config.useGzip)
+            .then(() => {
+                // Fetch did not fail. README.md exists.
                 repo.readme_url = readme_url;
-                resolve(repo);
-            });
-        });
+                return repo;
+            })
+            .catch(() => repo);
     }
 
     fetchTrendingWithReadme(lang: string) {
