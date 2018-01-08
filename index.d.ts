@@ -10,6 +10,7 @@ export interface Repositories {
 }
 export interface ScraperConfig {
     proxy?: string;
+    useGzip?: boolean;
 }
 export interface Language {
     color: string;

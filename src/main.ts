@@ -46,39 +46,6 @@ const RE_HREF_SCRAPE = /^\/([^\/]+)\/([^\/]+)$/;
 const RE_DIGITS = /\d+/;
 const RE_COMMA = /,/g;
 
-function fetchRequest(opts: request.Options, useGzip: boolean) {
-    if (useGzip) {
-        opts.headers = opts.headers || {};
-        opts.headers['Accept-Encoding'] = 'gzip';
-        opts.encoding = null;
-    }
-
-    return new Promise<string>((resolve, reject) => {
-        request(opts, (err, res, body) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            if (res.statusCode !== 200) {
-                reject(new Error('Invalid status: ' + res.statusCode));
-                return;
-            }
-
-            if (!useGzip) {
-                resolve(body);
-                return;
-            }
-
-            if (typeof window !== 'undefined' && window.TextDecoder !== undefined) {
-                resolve(new window.TextDecoder().decode(new Uint8Array(unzip(body))));
-            } else {
-                resolve(Buffer.from(unzip(body)).toString());
-            }
-        });
-    });
-}
-
 export class Scraper {
     config: ScraperConfig;
     private cache: object;
@@ -91,6 +58,43 @@ export class Scraper {
         this.cache = null;
     }
 
+    fetchRequest(opts: request.Options, useGzip: boolean) {
+        if (this.config.proxy) {
+            opts.proxy = this.config.proxy;
+        }
+
+        if (useGzip) {
+            opts.headers = opts.headers || {};
+            opts.headers['Accept-Encoding'] = 'gzip';
+            opts.encoding = null;
+        }
+
+        return new Promise<string>((resolve, reject) => {
+            request(opts, (err, res, body) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (res.statusCode !== 200) {
+                    reject(new Error('Invalid status: ' + res.statusCode));
+                    return;
+                }
+
+                if (!useGzip) {
+                    resolve(body);
+                    return;
+                }
+
+                if (typeof window !== 'undefined' && window.TextDecoder !== undefined) {
+                    resolve(new window.TextDecoder().decode(new Uint8Array(unzip(body))));
+                } else {
+                    resolve(Buffer.from(unzip(body)).toString());
+                }
+            });
+        });
+    }
+
     fetchTrendPage(lang_name: string) {
         const opts: request.Options = {
             url: 'https://github.com/trending',
@@ -100,11 +104,7 @@ export class Scraper {
             opts.url += '?l=' + lang_name;
         }
 
-        if (this.config.proxy) {
-            opts.proxy = this.config.proxy;
-        }
-
-        return fetchRequest(opts, !!this.config.useGzip);
+        return this.fetchRequest(opts, !!this.config.useGzip);
     }
 
     scrapeTrendingReposFullInfo(lang_name: string) {
@@ -229,11 +229,7 @@ export class Scraper {
             url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml',
         };
 
-        if (this.config.proxy) {
-            opts.proxy = this.config.proxy;
-        }
-
-        return fetchRequest(opts, !!this.config.useGzip).then(body => {
+        return this.fetchRequest(opts, !!this.config.useGzip).then(body => {
             const langs: Languages = yaml.safeLoad(body);
             this.cache = langs;
             return langs;
@@ -303,11 +299,7 @@ export class Client {
             headers,
         };
 
-        if (this.scraper.config.proxy) {
-            opts.proxy = this.scraper.config.proxy;
-        }
-
-        return fetchRequest(opts, !!this.scraper.config.useGzip).then(body => JSON.parse(body));
+        return this.scraper.fetchRequest(opts, !!this.scraper.config.useGzip).then(body => JSON.parse(body));
     }
 
     fetchTrending(lang: string) {
@@ -323,11 +315,8 @@ export class Client {
             method: 'HEAD',
         };
 
-        if (this.scraper.config.proxy) {
-            opts.proxy = this.scraper.config.proxy;
-        }
-
-        return fetchRequest(opts, !!this.scraper.config.useGzip)
+        return this.scraper
+            .fetchRequest(opts, !!this.scraper.config.useGzip)
             .then(() => {
                 // Fetch did not fail. README.md exists.
                 repo.readme_url = readme_url;
