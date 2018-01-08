@@ -3,4 +3,6 @@
 /test
 /.travis.yml
 /.npmrc
+/.prettierrc.json
+/.gitignore
 /tslint.json
