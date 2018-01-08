@@ -65,14 +65,15 @@ function fetchRequest(opts: request.Options, useGzip: boolean) {
                 return;
             }
 
-            if (useGzip) {
-                resolve(
-                    unzip(body)
-                        .map(c => String.fromCharCode(c))
-                        .join(''),
-                );
-            } else {
+            if (!useGzip) {
                 resolve(body);
+                return;
+            }
+
+            if (typeof window !== 'undefined' && window.TextDecoder !== undefined) {
+                resolve(new window.TextDecoder().decode(new Uint8Array(unzip(body))));
+            } else {
+                resolve(Buffer.from(unzip(body)).toString());
             }
         });
     });

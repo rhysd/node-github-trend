@@ -17,6 +17,7 @@
   },
   "include": [
     "main.ts",
+    "text-decoder.d.ts",
     "gzip-js.d.ts"
   ]
 }
