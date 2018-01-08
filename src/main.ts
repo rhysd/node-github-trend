@@ -84,6 +84,9 @@ export class Scraper {
 
     constructor(config?: ScraperConfig) {
         this.config = config || {};
+        if (this.config.useGzip === undefined) {
+            this.config.useGzip = true;
+        }
         this.cache = null;
     }
 

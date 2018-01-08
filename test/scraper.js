@@ -32,8 +32,8 @@ describe('Scraper', function() {
         });
     });
 
-    it('scrapes trending repositories for all languages using gzip encoding', function() {
-        return new Scraper({ useGzip: true }).scrapeTrendingReposFullInfo('all').then(repos => {
+    it('scrapes trending repositories for all languages without using gzip encoding', function() {
+        return new Scraper({ useGzip: false }).scrapeTrendingReposFullInfo('all').then(repos => {
             assert(repos.length > 0);
             for (const repo of repos) {
                 assert(repo.index >= 0);
