@@ -85,7 +85,7 @@ scraper.scrapeLanguageYAML().then(langs => {
 This returns all languages information detected in GitHub by scraping [here](https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml).
 The result is cached and reused.
 
-## Scraping language color
+## Scraping language colors
 
 ```javascript
 const Trending = require("github-trend");
@@ -108,6 +108,29 @@ scraper.scrapeLanguageNames().then(names => {
 }).catch(err => {
     console.error(err.message);
 });
+```
+
+## Collect trending repositories by scraping and GitHub API
+
+By scraping GitHub Trending Repositories page, the information is restricted to the information
+rendered in the page. This library also supports to getting information of trending repositories
+using GitHub Repositories API.
+
+Although an API token (the second parameter of `new Client`) is not mandatory, it is recommended
+for avoiding API rate limit.
+
+```javascript
+const {Client} = require("github-trend");
+const client = new Client(null, 'API access token here');
+
+client.fetchTrending('all').then(repos => {
+    for (const repo of repos) {
+        console.log('Name:', repo.full_name);
+        console.log('ID:', repo.id);
+        console.log('Topics:', repo.topics.join(' '));
+        console.log('License:', repo.license.name);
+    }
+}).catch(console.error);
 ```
 
 ## License
