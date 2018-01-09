@@ -372,6 +372,7 @@ export class Scraper {
 
 export type ClientConfig = ScraperConfig & {
     token?: string;
+    useCodeHubInternalAPI?: boolean;
 };
 
 export class Client {
@@ -380,6 +381,7 @@ export class Client {
 
     constructor(config?: ClientConfig, token?: string) {
         this.scraper = new Scraper(config);
+        this.config = config || {};
         this.config.token = token || (config || {}).token || null;
         if (token !== undefined) {
             /* tslint:disable:no-console */
@@ -410,6 +412,14 @@ export class Client {
     }
 
     fetchTrending(lang: string) {
+        if (this.config.useCodeHubInternalAPI) {
+            // XXX: Internal API. It may be changed suddenly.
+            let url = 'http://trending.codehub-app.com/v2/trending';
+            if (lang !== '' && lang !== 'all') {
+                url += '?language=' + lang;
+            }
+            return this.scraper.fetchRequest({ url }).then(text => JSON.parse(text));
+        }
         return this.scraper.scrapeTrendingRepos(lang).then((repos: RepositoryEntry[]) => {
             return Promise.all(repos.map(r => this.fetchGetRepoAPI(r)));
         });
