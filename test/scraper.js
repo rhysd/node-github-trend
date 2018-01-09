@@ -1,7 +1,8 @@
 const assert = require('assert');
-const neq = assert.notStrictEqual;
 const Scraper = require('../build/main').Scraper;
 
+const neq = assert.notStrictEqual;
+const eq = assert.strictEqual;
 const RE_COLOR = /^#[0-9A-Fa-f]{6}$/i;
 
 describe('Scraper', function() {
@@ -80,6 +81,20 @@ describe('Scraper', function() {
                 assert(RE_COLOR.test(color));
             }
         });
+    });
+
+    it('caches languages data', function() {
+        let previous;
+        const s = new Scraper();
+        return s
+            .fetchLanguageYAML()
+            .then(data => {
+                previous = data;
+            })
+            .then(() => s.fetchLanguageYAML())
+            .then(data => {
+                eq(previous, data);
+            });
     });
 
     it('scrapes names of languages', function() {
