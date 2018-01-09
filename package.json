@@ -3,17 +3,18 @@
   "version": "0.3.0",
   "description": "node.js library for GitHub trending repositories",
   "main": "./build/main.js",
+  "typings": "./build/main.d.ts",
   "author": "rhysd <lin90162@yahoo.co.jp>",
   "scripts": {
     "build": "tsc --pretty -p src/",
     "watch": "tsc --pretty -p src/ --watch",
-    "dts": "tsc -p src/ -d --outDir ./",
+    "dts": "tsc --pretty -p src/ -d",
     "lint": "tslint -p src/",
     "fmt": "prettier --write 'src/**/*.ts'",
     "test": "nyc mocha test/",
     "report-coverage": "nyc report --reporter=html && open ./coverage/index.html",
     "coverage": "npm run test && npm run report-coverage",
-    "preversion": "npm run fmt && npm run lint && npm run test"
+    "preversion": "npm run fmt && npm run lint && npm run test && npm run dts"
   },
   "repository": {
     "type": "git",

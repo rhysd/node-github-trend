@@ -8,12 +8,12 @@ export interface RepositoryEntry {
     name: string;
 }
 
-export interface Repository {
-    [param: string]: any;
+export interface APIRepository {
+    [key: string]: any;
 }
 
-export interface Repositories {
-    [lang: string]: Repository[];
+export interface LangsRepositories {
+    [lang: string]: APIRepository[];
 }
 
 export interface ScraperConfig {
@@ -30,7 +30,7 @@ export interface Languages {
     [lang: string]: Language;
 }
 
-export interface FullRepository {
+export interface ScrapedRepository {
     index: number;
     name: string;
     owner: string;
@@ -42,13 +42,18 @@ export interface FullRepository {
     [k: string]: string | number;
 }
 
+export interface RepoSlug {
+    name: string;
+    owner: string;
+}
+
 const RE_HREF_SCRAPE = /^\/([^\/]+)\/([^\/]+)$/;
 const RE_DIGITS = /\d+/;
 const RE_COMMA = /,/g;
 
 export class Scraper {
     config: ScraperConfig;
-    private cache: object;
+    private cache: Languages | null;
 
     constructor(config?: ScraperConfig) {
         this.config = config || {};
@@ -124,7 +129,7 @@ export class Scraper {
                     allStars: null,
                     todaysStars: null,
                     forks: null,
-                } as FullRepository;
+                } as ScrapedRepository;
 
                 const domElem = dom(li);
                 const a = domElem.find('h3 a')[0];
@@ -198,7 +203,7 @@ export class Scraper {
 
     scrapeTrendingRepos(lang: string) {
         return this.fetchTrendPage(lang).then((html: string) => {
-            const repos = [];
+            const repos: RepoSlug[] = [];
             const dom = cheerio.load(html);
             const items = dom('.repo-list li');
             /* tslint:disable:prefer-for-of */
@@ -325,14 +330,14 @@ export class Client {
     }
 
     fetchTrendingWithReadme(lang: string) {
-        return this.fetchTrending(lang).then((repos: Repository[]) => {
+        return this.fetchTrending(lang).then((repos: APIRepository[]) => {
             return Promise.all(repos.map(r => this.fetchAppendingReadme(r)));
         });
     }
 
     fetchTrendingsWithReadme(langs: string[]) {
-        return Promise.all(langs.map(l => this.fetchTrendingWithReadme(l))).then((trendings: Repository[][]) => {
-            const result: Repositories = {};
+        return Promise.all(langs.map(l => this.fetchTrendingWithReadme(l))).then((trendings: APIRepository[][]) => {
+            const result: LangsRepositories = {};
             langs.forEach((lang, idx) => {
                 result[lang] = trendings[idx];
             });
@@ -341,8 +346,8 @@ export class Client {
     }
 
     fetchTrendings(langs: string[]) {
-        return Promise.all(langs.map(l => this.fetchTrending(l))).then((trendings: Repository[][]) => {
-            const result: Repositories = {};
+        return Promise.all(langs.map(l => this.fetchTrending(l))).then((trendings: APIRepository[][]) => {
+            const result: LangsRepositories = {};
             langs.forEach((lang, idx) => {
                 result[lang] = trendings[idx];
             });
