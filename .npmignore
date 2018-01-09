@@ -8,4 +8,5 @@
 /tslint.json
 /.nyc_output
 /coverage
+/env.sh
 npm-debug.log
