@@ -8,11 +8,11 @@ Scraping GitHub Trending Repositories
 ## Only scraping
 
 ```javascript
-const Trending = require("github-trend");
+const Trending = require('github-trend');
 const scraper = new Trending.Scraper();
 
 // Empty string means 'all languages'
-scraper.scrapeTrendingReposFullInfo("").then(repos => {
+scraper.scrapeTrendingReposFullInfo('').then(repos => {
     for (const repo of repos) {
         console.log(repo.owner);
         console.log(repo.name);
@@ -27,9 +27,9 @@ scraper.scrapeTrendingReposFullInfo("").then(repos => {
 });
 
 // For other languages
-scraper.scrapeTrendingReposFullInfo("rust");
-scraper.scrapeTrendingReposFullInfo("vim");
-scraper.scrapeTrendingReposFullInfo("go");
+scraper.scrapeTrendingReposFullInfo('rust');
+scraper.scrapeTrendingReposFullInfo('vim');
+scraper.scrapeTrendingReposFullInfo('go');
 ```
 
 `Scraper` only scrapes GitHub trending page. This returns an array of repository information.
@@ -38,10 +38,10 @@ This method is relatively faster because of sending request only once per langua
 ## Scraping and getting full repository information
 
 ```javascript
-const Trending = require("github-trend");
+const Trending = require('github-trend');
 const client = new Trending.Client();
 
-client.fetchTrending("").then(repos => {
+'lient.fetchTrending('').then(repos => {
     for (const repo of repos) {
         // Result of https://api.github.com/repos/:user/:name
         console.log(repo);
@@ -51,7 +51,7 @@ client.fetchTrending("").then(repos => {
 });
 
 // Fetch all API call asynchronously
-client.fetchTrendings(["", "vim", "go"]).then(repos => {
+client.fetchTrendings(['', 'vim', 'go']).then(repos => {
     for (const lang in repos) {
         for (const repo of repos[lang]) {
             // Result of https://api.github.com/repos/:user/:name
@@ -69,7 +69,7 @@ This takes more time than only scraping, but all requests are sent asynchronousl
 ## Scraping language information
 
 ```javascript
-const Trending = require("github-trend");
+const Trending = require('github-trend');
 const scraper = new Trending.Scraper();
 
 scraper.scrapeLanguageYAML().then(langs => {
@@ -88,13 +88,13 @@ The result is cached and reused.
 ## Scraping language colors
 
 ```javascript
-const Trending = require("github-trend");
+const Trending = require('github-trend');
 const scraper = new Trending.Scraper();
 
 scraper.scrapeLanguageColors().then(colors => {
     for (const name in colors) {
-        console.log("name: " + name);
-        console.log("color: " + colors[name]);
+        console.log('name: ' + name);
+        console.log('color: ' + colors[name]);
     }
 }).catch(err => {
     console.error(err.message);
@@ -120,7 +120,7 @@ Although an API token (the second parameter of `new Client`) is not mandatory, i
 for avoiding API rate limit.
 
 ```javascript
-const {Client} = require("github-trend");
+const {Client} = require('github-trend');
 const client = new Client({token: 'API access token here'});
 
 client.fetchTrending('all').then(repos => {
