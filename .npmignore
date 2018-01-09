@@ -6,3 +6,6 @@
 /.prettierrc.json
 /.gitignore
 /tslint.json
+/.nyc_output
+/coverage
+npm-debug.log

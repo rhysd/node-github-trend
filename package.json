@@ -11,7 +11,8 @@
     "lint": "tslint -p src/",
     "fmt": "prettier --write 'src/**/*.ts'",
     "test": "nyc mocha test/",
-    "coverage": "npm run test && nyc report --reporter=html && open ./coverage/index.html",
+    "report-coverage": "nyc report --reporter=html && open ./coverage/index.html",
+    "coverage": "npm run test && npm run report-coverage",
     "preversion": "npm run fmt && npm run lint && npm run test"
   },
   "repository": {

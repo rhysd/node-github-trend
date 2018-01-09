@@ -57,10 +57,24 @@ describe('Scraper', function() {
         });
     });
 
+    it('scrapes simple trending repositories for all languages', function() {
+        return new Scraper().scrapeTrendingRepos('all').then(repos => {
+            assert(repos.length > 0);
+            for (const repo of repos) {
+                const msg = JSON.stringify(repo);
+                neq(repo.name, null, msg);
+                neq(repo.owner, null, msg);
+                neq(repo.name, '', msg);
+                neq(repo.owner, '', msg);
+            }
+        });
+    });
+
     it('scrapes colors of languages', function() {
         return new Scraper().scrapeLanguageColors().then(langs => {
-            assert(Object.keys(langs).length > 0);
-            for (const name in langs) {
+            const names = Object.keys(langs);
+            assert(names.length > 0);
+            for (const name of names) {
                 assert(name);
                 const color = langs[name];
                 assert(RE_COLOR.test(color));

@@ -95,13 +95,13 @@ export class Scraper {
         });
     }
 
-    fetchTrendPage(lang_name: string) {
+    fetchTrendPage(lang: string) {
         const opts: request.Options = {
             url: 'https://github.com/trending',
         };
 
-        if (lang_name) {
-            opts.url += '?l=' + lang_name;
+        if (lang) {
+            opts.url += '?l=' + lang;
         }
 
         return this.fetchRequest(opts, !!this.config.useGzip);
@@ -196,25 +196,24 @@ export class Scraper {
         });
     }
 
-    scrapeTrendingRepos(lang_name: string) {
-        return this.fetchTrendPage(lang_name).then((html: string) => {
-            const dom = cheerio.load(html);
-            const links = dom('.repo-list h3 a');
+    scrapeTrendingRepos(lang: string) {
+        return this.fetchTrendPage(lang).then((html: string) => {
             const repos = [];
+            const dom = cheerio.load(html);
+            const items = dom('.repo-list li');
             /* tslint:disable:prefer-for-of */
-            for (let i = 0; i < links.length; i++) {
+            for (let i = 0; i < items.length; i++) {
                 /* tslint:enable:prefer-for-of */
-                const a = links[i];
+                const li = items[i];
+                const a = dom(li).find('h3 a')[0];
                 const href: string = a.attribs.href;
                 const match = href.match(RE_HREF_SCRAPE);
-                if (!match) {
-                    // Ignore parse failures
-                    continue;
+                if (match) {
+                    repos.push({
+                        owner: match[1],
+                        name: match[2],
+                    });
                 }
-                repos.push({
-                    owner: match[1],
-                    name: match[2],
-                });
             }
             return repos;
         });
