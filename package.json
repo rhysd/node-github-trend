@@ -26,7 +26,6 @@
   "license": "MIT",
   "dependencies": {
     "cheerio": "^0.22.0",
-    "gzip-js": "^0.3.2",
     "js-yaml": "^3.10.0",
     "request": "^2.83.0"
   },

@@ -1,7 +1,6 @@
 import * as request from 'request';
 import * as cheerio from 'cheerio';
 import * as yaml from 'js-yaml';
-import { unzip } from 'gzip-js';
 
 export interface RepositoryEntry {
     owner: string;
@@ -63,15 +62,13 @@ export class Scraper {
         this.cache = null;
     }
 
-    fetchRequest(opts: request.Options, useGzip: boolean) {
+    fetchRequest(opts: request.Options) {
         if (this.config.proxy) {
             opts.proxy = this.config.proxy;
         }
 
-        if (useGzip) {
-            opts.headers = opts.headers || {};
-            opts.headers['Accept-Encoding'] = 'gzip';
-            opts.encoding = null;
+        if (this.config.useGzip) {
+            opts.gzip = true;
         }
 
         return new Promise<string>((resolve, reject) => {
@@ -86,16 +83,7 @@ export class Scraper {
                     return;
                 }
 
-                if (!useGzip) {
-                    resolve(body);
-                    return;
-                }
-
-                if (typeof window !== 'undefined' && window.TextDecoder !== undefined) {
-                    resolve(new window.TextDecoder().decode(new Uint8Array(unzip(body))));
-                } else {
-                    resolve(Buffer.from(unzip(body)).toString());
-                }
+                resolve(body);
             });
         });
     }
@@ -109,7 +97,7 @@ export class Scraper {
             opts.url += '?l=' + lang;
         }
 
-        return this.fetchRequest(opts, !!this.config.useGzip);
+        return this.fetchRequest(opts);
     }
 
     scrapeTrendingReposFullInfo(lang_name: string) {
@@ -233,7 +221,7 @@ export class Scraper {
             url: 'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml',
         };
 
-        return this.fetchRequest(opts, !!this.config.useGzip).then(body => {
+        return this.fetchRequest(opts).then(body => {
             const langs: Languages = yaml.safeLoad(body);
             this.cache = langs;
             return langs;
@@ -303,7 +291,7 @@ export class Client {
             headers,
         };
 
-        return this.scraper.fetchRequest(opts, !!this.scraper.config.useGzip).then(body => JSON.parse(body));
+        return this.scraper.fetchRequest(opts).then(body => JSON.parse(body));
     }
 
     fetchTrending(lang: string) {
@@ -320,7 +308,7 @@ export class Client {
         };
 
         return this.scraper
-            .fetchRequest(opts, !!this.scraper.config.useGzip)
+            .fetchRequest(opts)
             .then(() => {
                 // Fetch did not fail. README.md exists.
                 repo.readme_url = readme_url;
