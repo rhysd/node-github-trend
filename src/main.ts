@@ -267,13 +267,25 @@ export class Scraper {
     }
 }
 
+export type ClientConfig = ScraperConfig & {
+    token?: string;
+};
+
 export class Client {
     scraper: Scraper;
-    token: string;
+    config: ClientConfig | null;
 
-    constructor(config?: ScraperConfig, token?: string) {
+    constructor(config?: ClientConfig, token?: string) {
         this.scraper = new Scraper(config);
-        this.token = token || null;
+        this.config.token = token || (config || {}).token || null;
+        if (token !== undefined) {
+            /* tslint:disable:no-console */
+            console.warn(
+                'github-trend: The second parameter of constructor of Trending.Client class is deprecated.' +
+                    ' Please use token property of the config passed to the first parameter.',
+            );
+            /* tslint:enable:no-console */
+        }
     }
 
     fetchGetRepoAPI(repo: RepositoryEntry) {
@@ -282,8 +294,8 @@ export class Client {
             Accept: 'application/vnd.github.v3+json',
         };
 
-        if (this.token) {
-            headers.Authorization = 'token ' + this.token;
+        if (this.config.token) {
+            headers.Authorization = 'token ' + this.config.token;
         }
 
         const opts: request.Options = {

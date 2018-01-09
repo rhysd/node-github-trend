@@ -12,7 +12,7 @@ describe('Client', function() {
         if (!token) {
             this.skip();
         }
-        const client = new Client(null, token);
+        const client = new Client({ token });
         return client.fetchTrendings(['all']).then(langTrends => {
             assert(langTrends.all, String(langTrends.all));
             const trends = langTrends.all;

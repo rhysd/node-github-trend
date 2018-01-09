@@ -121,7 +121,7 @@ for avoiding API rate limit.
 
 ```javascript
 const {Client} = require("github-trend");
-const client = new Client(null, 'API access token here');
+const client = new Client({token: 'API access token here'});
 
 client.fetchTrending('all').then(repos => {
     for (const repo of repos) {
