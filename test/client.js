@@ -15,8 +15,7 @@ describe('Client', function() {
         const client = new Client({ token });
         return client.fetchTrendings(['all']).then(langTrends => {
             assert(langTrends.all, String(langTrends.all));
-            const trends = langTrends.all;
-            const repos = Object.keys(trends);
+            const repos = langTrends.all;
             neq(repos.length, 0);
             for (const repo of repos) {
                 const msg = JSON.stringify(repo, null, 2);
