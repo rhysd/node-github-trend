@@ -116,7 +116,7 @@ By scraping GitHub Trending Repositories page, the information is restricted to 
 rendered in the page. This library also supports to getting information of trending repositories
 using GitHub Repositories API.
 
-Although an API token (the second parameter of `new Client`) is not mandatory, it is recommended
+Although an API token (at the first parameter of `new Client`) is not mandatory, it is recommended
 for avoiding API rate limit.
 
 ```javascript
