@@ -41,7 +41,7 @@ This method is relatively faster because of sending request only once per langua
 const Trending = require('github-trend');
 const client = new Trending.Client();
 
-'lient.fetchTrending('').then(repos => {
+client.fetchTrending('').then(repos => {
     for (const repo of repos) {
         // Result of https://api.github.com/repos/:user/:name
         console.log(repo);
