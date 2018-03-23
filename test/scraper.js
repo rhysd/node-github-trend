@@ -3,7 +3,7 @@ const Scraper = require('../build/main').Scraper;
 
 const neq = assert.notStrictEqual;
 const eq = assert.strictEqual;
-const RE_COLOR = /^#[0-9A-Fa-f]{6}$/i;
+const RE_COLOR = /^#(:?[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/i;
 
 describe('Scraper', function() {
     this.timeout(10000);
