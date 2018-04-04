@@ -325,7 +325,7 @@ export class Scraper {
         };
 
         return this.fetchRequest(opts).then(body => {
-            const langs: Languages = yaml.safeLoad(body);
+            const langs = yaml.safeLoad(body) as Languages;
             this.cache = langs;
             return langs;
         });
